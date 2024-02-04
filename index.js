@@ -2,6 +2,10 @@ const TelegramApi = require('node-telegram-bot-api')
 
 const {gameOptions, againOptions,} = require('./options')
 
+const sequelize = require('./db')
+
+const UserModel = require('./models')
+
 const token = '6865092143:AAHA0JulVoBCfAIgjRSfZRcQFHoNWenYYiI'
 
 const bot = new TelegramApi(token, {polling: true})
@@ -16,7 +20,15 @@ const startGame = async (chatId)=> {
 }
 
 
-const start= () => {
+const start = async ()  => {
+
+    try {
+        await sequelize.authenticate()
+        await sequelize.sync()
+    } catch (e) {
+        console.log("Подключение к БД сломалось", e)
+    }
+
     bot.setMyCommands([
         {
             command: '/start',
@@ -32,19 +44,31 @@ const start= () => {
         }
     ])
 
+
     bot.on('message', async msg => {
+
         const text = msg.text
         const chatId = msg.chat.id
-        if (text === '/start') {
-            return  bot.sendMessage(chatId, `иди нах ${msg.from.first_name} ${msg.from.last_name}`)
+
+        try {
+            if (text === '/start') {
+                // create cоздаем запись в бд
+                await UserModel.create({chatId})
+                return  bot.sendMessage(chatId, `иди нах ${msg.from.first_name} ${msg.from.last_name}`)
+            }
+            if (text === '/info') {
+                const user = await UserModel.findOne({chatId})
+                return  bot.sendMessage(chatId, `your message ${text}, ${msg.from.first_name} ${msg.from.last_name}, в игре у тебя правильных ответов ${user.right}, неправильных, ${user.wrong}`)
+            }
+            if (text === '/game') {
+                return startGame(chatId)
+            }
+            return bot.sendMessage(chatId, 'я хз о чем ты')
+        } catch (e) {
+            return  bot.sendMessage(chatId, 'Произошла какая-то ошибка')
         }
-        if (text === '/info') {
-            return  bot.sendMessage(chatId, `your message ${text}`)
-        }
-        if (text === '/game') {
-            return startGame(chatId)
-        }
-        return bot.sendMessage(chatId, 'я хз о чем ты')
+
+
     })
 
     bot.on('callback_query',async msg => {
@@ -55,12 +79,17 @@ const start= () => {
            return startGame(chatId)
         }
 
+        const user = await UserModel.findOne({chatId})
 
         if (data == chats[chatId]) {
-            return await bot.sendMessage(chatId, `Верно ${chats[chatId]}`, againOptions)
+            user.right += 1
+            await bot.sendMessage(chatId, `Верно ${chats[chatId]}`, againOptions)
         } else {
-            return await bot.sendMessage(chatId, `Нет, цифра была ${chats[chatId]}`, againOptions)
+            user.wrong += 1
+            await bot.sendMessage(chatId, `Нет, цифра была ${chats[chatId]}`, againOptions)
         }
+
+        await user.save()
 
 
 
