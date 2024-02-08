@@ -1,10 +1,10 @@
 {
   "name": "telegram-bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "bot.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon bot.js",
+    "start": "node bot.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "nodemon": "^3.0.3",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
+    "prettier": "^3.2.5",
     "sequelize": "^6.36.0"
   }
 }
