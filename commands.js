@@ -6,34 +6,50 @@ const EventBD = require('./models')(sequelize, Sequelize.DataTypes)
 const { setUserState, getUserState, updateUserState } = require('./stateManager')
 // Определение команд бота
 async function setCommands(bot) {
-  await bot.on('text', async (msg) => {
+  // await bot.on('text', async (msg) => {
+  //   const events = await EventBD.findAll()
+  //
+  //   let messageText = 'Список мероприятий:\n'
+  //   events.forEach((event, index) => {
+  //     messageText +=
+  //       `${index + 1}\n` +
+  //       // `Мероприятие №${event.id}\n` +
+  //       `Описание: ${event.description}\n` + // исправил ошибку здесь
+  //       `Название: ${event.title}\n` +
+  //       `Дата: ${event.date}\n` +
+  //       `Время: ${event.time}\n` +
+  //       `Место: ${event.location}\n\n\n` // Добавлена пустая строка для разделения
+  //   })
+  //   messageText += `Выберите действие:\n`
+  //
+  //   if (msg.text.includes('@FreaksFromChatBot')) {
+  //     const chatId = msg.chat.id
+  //     await bot.sendMessage(chatId, messageText, StartSelectOptions)
+  //   } else {
+  //   }
+  // })
+  // bot.onText(/\/start/, (msg) => {
+
+  bot.onText(/\/start/, async (msg) => {
+    const chatId = msg.chat.id
+
     const events = await EventBD.findAll()
 
-    let messageText = 'Список мероприятий:\n'
-    events.forEach((event, index) => {
-      messageText +=
-        `${index + 1}\n` +
-        // `Мероприятие №${event.id}\n` +
-        `Описание: ${event.description}\n` + // исправил ошибку здесь
-        `Название: ${event.title}\n` +
-        `Дата: ${event.date}\n` +
-        `Время: ${event.time}\n` +
-        `Место: ${event.location}\n\n\n` // Добавлена пустая строка для разделения
-    })
-    messageText += `Выберите действие:\n`
-
-    if (msg.text.includes('@FreaksFromChatBot')) {
-      const chatId = msg.chat.id
-      await bot.sendMessage(chatId, messageText, StartSelectOptions)
-    } else {
-      bot.onText(/\/start/, (msg) => {
-        const chatId = msg.chat.id
-        bot.sendMessage(chatId, messageText, StartSelectOptions)
+      let messageText = 'Список мероприятий:\n'
+      events.forEach((event, index) => {
+        messageText +=
+          `${index + 1}\n` +
+          // `Мероприятие №${event.id}\n` +
+          `Описание: ${event.description}\n` + // исправил ошибку здесь
+          `Название: ${event.title}\n` +
+          `Дата: ${event.date}\n` +
+          `Время: ${event.time}\n` +
+          `Место: ${event.location}\n\n\n` // Добавлена пустая строка для разделения
       })
-    }
-  })
+      messageText += `Выберите действие:\n`
 
-  // bot.onText(/\/start/, (msg) => {
+   await bot.sendMessage(chatId, messageText, StartSelectOptions)
+  })
   //   const chatId = msg.chat.id
   //   bot.sendMessage(chatId, 'Выберите действие:', StartSelectOptions)
   // })
@@ -59,45 +75,45 @@ async function setCommands(bot) {
   //     // Обработка обычных команд
   //   }
   // })
-  bot.on('message', async (msg) => {
-    const chatId = msg.chat.id
-    const state = getUserState(chatId)
-
-    // Проверяем, ожидаем ли мы ввод от пользователя
-    if (state && state.awaitingInput) {
-      const inputType = state.awaitingInput // Тип ожидаемого ввода
-      const userInput = msg.text // Ввод пользователя
-
-      // Сохраняем ввод пользователя в соответствующее поле объекта event
-      const event = state.event || {}
-      event[inputType] = userInput // Обновляем объект event, используя inputType как ключ
-      updateUserState(chatId, { event: event, awaitingInput: null }) // Сбрасываем awaitingInput
-      let rusNamingFromEvent = ''
-      switch (inputType) {
-        case 'title':
-          rusNamingFromEvent = 'Название'
-          break
-        case 'description':
-          rusNamingFromEvent = 'Описание'
-          break
-        case 'date':
-          rusNamingFromEvent = 'Дата'
-          break
-        case 'time':
-          rusNamingFromEvent = 'Время'
-          break
-        case 'location':
-          rusNamingFromEvent = 'Локация'
-          break
-      }
-      // Уведомляем пользователя и запрашиваем следующий ввод или подтверждаем сохранение
-      await bot.sendMessage(
-        chatId,
-        `${rusNamingFromEvent}: ${event[inputType]} сохранён. Что дальше?`,
-        ChangeEventOptions,
-      )
-    }
-  })
+  // bot.on('message', async (msg) => {
+  //   const chatId = msg.chat.id
+  //   const state = getUserState(chatId)
+  //
+  //   // Проверяем, ожидаем ли мы ввод от пользователя
+  //   if (state && state.awaitingInput) {
+  //     const inputType = state.awaitingInput // Тип ожидаемого ввода
+  //     const userInput = msg.text // Ввод пользователя
+  //
+  //     // Сохраняем ввод пользователя в соответствующее поле объекта event
+  //     const event = state.event || {}
+  //     event[inputType] = userInput // Обновляем объект event, используя inputType как ключ
+  //     updateUserState(chatId, { event: event, awaitingInput: null }) // Сбрасываем awaitingInput
+  //     let rusNamingFromEvent = ''
+  //     switch (inputType) {
+  //       case 'title':
+  //         rusNamingFromEvent = 'Название'
+  //         break
+  //       case 'description':
+  //         rusNamingFromEvent = 'Описание'
+  //         break
+  //       case 'date':
+  //         rusNamingFromEvent = 'Дата'
+  //         break
+  //       case 'time':
+  //         rusNamingFromEvent = 'Время'
+  //         break
+  //       case 'location':
+  //         rusNamingFromEvent = 'Локация'
+  //         break
+  //     }
+  //     // Уведомляем пользователя и запрашиваем следующий ввод или подтверждаем сохранение
+  //     await bot.sendMessage(
+  //       chatId,
+  //       `${rusNamingFromEvent}: ${event[inputType]} сохранён. Что дальше?`,
+  //       ChangeEventOptions,
+  //     )
+  //   }
+  // })
   // Команда для добавления мероприятия
   //Пока выключил!!!!!!!!
   // bot.onText(/\/addevent/, (msg) => {
@@ -112,10 +128,10 @@ async function setCommands(bot) {
   // })
 
   // Обработчик для сохранения данных мероприятия
-  bot.on('message', (msg) => {
-    // Реализация логики сохранения данных мероприятия в БД
-    // Необходимо проверить формат сообщения, чтобы соответствовал ожидаемому для мероприятия
-  })
+  // bot.on('message', (msg) => {
+  //   // Реализация логики сохранения данных мероприятия в БД
+  //   // Необходимо проверить формат сообщения, чтобы соответствовал ожидаемому для мероприятия
+  // })
 
   // Команда для просмотра мероприятий
   ////Пока выключил!!!!!!!!
