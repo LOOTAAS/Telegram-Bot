@@ -53,67 +53,67 @@ async function setCommands(bot) {
   //   const chatId = msg.chat.id
   //   bot.sendMessage(chatId, 'Выберите действие:', StartSelectOptions)
   // })
-  // bot.on('message', async (msg) => {
-  //   const chatId = msg.chat.id
-  //   if (getUserState[chatId] && getUserState[chatId].state === 'ADDING_EVENT') {
-  //     // Обработка ввода в зависимости от текущего состояния
-  //     const currentState = getUserState[chatId].state
-  //     switch (currentState) {
-  //       case 'ADDING_TITLE':
-  //         getUserState[chatId].event.title = msg.text
-  //         // Переход к следующему шагу
-  //         await bot.sendMessage(chatId, "Введите описание мероприятия (или пропустите этот шаг, отправив '-'):") // Пример перехода к следующему шагу
-  //         getUserState[chatId].state = 'ADDING_DESCRIPTION'
-  //         await bot.sendMessage(
-  //           chatId,
-  //           "Введите описание мероприятия (или пропустите этот шаг, отправив '-'):" + userStates[chatId].state,
-  //         ) // Пример перехода к следующему шагу
-  //         break
-  //       // Добавьте обработку других состояний здесь
-  //     }
-  //   } else {
-  //     // Обработка обычных команд
-  //   }
-  // })
-  // bot.on('message', async (msg) => {
-  //   const chatId = msg.chat.id
-  //   const state = getUserState(chatId)
-  //
-  //   // Проверяем, ожидаем ли мы ввод от пользователя
-  //   if (state && state.awaitingInput) {
-  //     const inputType = state.awaitingInput // Тип ожидаемого ввода
-  //     const userInput = msg.text // Ввод пользователя
-  //
-  //     // Сохраняем ввод пользователя в соответствующее поле объекта event
-  //     const event = state.event || {}
-  //     event[inputType] = userInput // Обновляем объект event, используя inputType как ключ
-  //     updateUserState(chatId, { event: event, awaitingInput: null }) // Сбрасываем awaitingInput
-  //     let rusNamingFromEvent = ''
-  //     switch (inputType) {
-  //       case 'title':
-  //         rusNamingFromEvent = 'Название'
-  //         break
-  //       case 'description':
-  //         rusNamingFromEvent = 'Описание'
-  //         break
-  //       case 'date':
-  //         rusNamingFromEvent = 'Дата'
-  //         break
-  //       case 'time':
-  //         rusNamingFromEvent = 'Время'
-  //         break
-  //       case 'location':
-  //         rusNamingFromEvent = 'Локация'
-  //         break
-  //     }
-  //     // Уведомляем пользователя и запрашиваем следующий ввод или подтверждаем сохранение
-  //     await bot.sendMessage(
-  //       chatId,
-  //       `${rusNamingFromEvent}: ${event[inputType]} сохранён. Что дальше?`,
-  //       ChangeEventOptions,
-  //     )
-  //   }
-  // })
+  bot.on('message', async (msg) => {
+    const chatId = msg.chat.id
+    if (getUserState[chatId] && getUserState[chatId].state === 'ADDING_EVENT') {
+      // Обработка ввода в зависимости от текущего состояния
+      const currentState = getUserState[chatId].state
+      switch (currentState) {
+        case 'ADDING_TITLE':
+          getUserState[chatId].event.title = msg.text
+          // Переход к следующему шагу
+          await bot.sendMessage(chatId, "Введите описание мероприятия (или пропустите этот шаг, отправив '-'):") // Пример перехода к следующему шагу
+          getUserState[chatId].state = 'ADDING_DESCRIPTION'
+          await bot.sendMessage(
+            chatId,
+            "Введите описание мероприятия (или пропустите этот шаг, отправив '-'):" + userStates[chatId].state,
+          ) // Пример перехода к следующему шагу
+          break
+        // Добавьте обработку других состояний здесь
+      }
+    } else {
+      // Обработка обычных команд
+    }
+  })
+  bot.on('message', async (msg) => {
+    const chatId = msg.chat.id
+    const state = getUserState(chatId)
+
+    // Проверяем, ожидаем ли мы ввод от пользователя
+    if (state && state.awaitingInput) {
+      const inputType = state.awaitingInput // Тип ожидаемого ввода
+      const userInput = msg.text // Ввод пользователя
+
+      // Сохраняем ввод пользователя в соответствующее поле объекта event
+      const event = state.event || {}
+      event[inputType] = userInput // Обновляем объект event, используя inputType как ключ
+      updateUserState(chatId, { event: event, awaitingInput: null }) // Сбрасываем awaitingInput
+      let rusNamingFromEvent = ''
+      switch (inputType) {
+        case 'title':
+          rusNamingFromEvent = 'Название'
+          break
+        case 'description':
+          rusNamingFromEvent = 'Описание'
+          break
+        case 'date':
+          rusNamingFromEvent = 'Дата'
+          break
+        case 'time':
+          rusNamingFromEvent = 'Время'
+          break
+        case 'location':
+          rusNamingFromEvent = 'Локация'
+          break
+      }
+      // Уведомляем пользователя и запрашиваем следующий ввод или подтверждаем сохранение
+      await bot.sendMessage(
+        chatId,
+        `${rusNamingFromEvent}: ${event[inputType]} сохранён. Что дальше?`,
+        ChangeEventOptions,
+      )
+    }
+  })
   // Команда для добавления мероприятия
   //Пока выключил!!!!!!!!
   // bot.onText(/\/addevent/, (msg) => {
